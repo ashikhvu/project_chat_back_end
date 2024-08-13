@@ -79,7 +79,7 @@ class GetUserData(APIView):
                 serializer = ShowUserModelsSerializer(user,many=False)
                 return Response(serializer.data)
         else:
-            user = UserModel.objects.get(username=request.user)
+            user = UserModel.objects.get(id=request.user.id)
             if user:
                 serializer = ShowUserModelsSerializer(user,many=False)
                 return Response(serializer.data)
@@ -89,7 +89,7 @@ class GetAllUserData(APIView):
     permission_classes = [IsAuthenticated]
     def get(self,request,**kwargs):
         search_text = request.GET.get('search_text')
-        print(search_text)
+        # print(search_text)
         if search_text:
             user = UserModel.objects.filter(name__icontains=search_text).exclude(username=request.user.username)
             if user:
@@ -106,16 +106,47 @@ class SendRequest(APIView):
     permission_classes = [IsAuthenticated]
     def get(self,request,**kwargs):
         id = request.GET.get('id')
-        print(f'===={id}=====')
-        if id:
-            user = Request.objects.filter(req_from=id)
-            if user:
-                serializer = ShowRequestSerializer(user,many=True)
+        req_from= request.GET.get('req_from')
+        req_to= request.GET.get('req_to')
+        print(f'{req_from} {req_to}')
+        if req_from and req_to: #get signle request
+            print('here')
+            try:
+                req_data = Request.objects.get(req_from=req_from,req_to=req_to)
+                print(req_data)
+                if req_data:
+                    serializer = ShowRequestSerializer(req_data,many=False)
+                    return Response(serializer.data)
+            except:
+                pass
+            return JsonResponse({"error":"Request doesn't exist."})
+        elif id:    #get multiple requests
+            print('hey')
+            req_data = Request.objects.filter(req_from=id)
+            if req_data:
+                serializer = ShowRequestSerializer(req_data,many=True)
                 return Response(serializer.data)
         return JsonResponse({'error':'Give an id'})
+    
     def post(self,request,**kwargs):
         serializer = RequestSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
+    
+    def delete(self,request,**kwargs):
+        req_from= request.data.get('req_from')
+        req_to= request.data.get('req_to')
+        print(f'{req_from} {req_to}')
+        if req_from and req_to:
+            print('valid')
+            try:
+                request_data = Request.objects.filter(req_from=req_from,req_to=req_to)
+                if request_data:
+                    request_data.delete()
+                    return JsonResponse({"success":"Request Cancelled"})
+            except:
+                pass
+        return JsonResponse({"error":"Request doesn't exist."})
+        
