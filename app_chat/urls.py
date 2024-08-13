@@ -13,4 +13,7 @@ urlpatterns=[
     path('get_all_user_data',views.GetAllUserData.as_view(),name='get_all_user_data'),
     path('search_user',views.GetAllUserData.as_view(),name='search_user'),
     path('send_request',views.SendRequest.as_view(),name='send_request'),
+    path('request_contact',views.RequestContact.as_view(),name='request_contact'),
+    path('accept_request',views.SendRequest.as_view(),name='accept_request'),
+    path('send_msg',views.ChatMessages.as_view(),name='send_msg'),
 ]

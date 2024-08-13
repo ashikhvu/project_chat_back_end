@@ -31,3 +31,16 @@ class ShowRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Request
         fields = "__all__"
+
+class ChatModelSeralizer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatModel
+        fields = ['from_user','to_user','msg']
+
+class ShowChatModelSeralizer(serializers.ModelSerializer):
+    from_user = UserModelsSerializer()
+    to_user = UserModelsSerializer()
+
+    class Meta:
+        model = ChatModel
+        fields = '__all__'

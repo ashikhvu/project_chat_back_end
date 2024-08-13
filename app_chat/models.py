@@ -7,6 +7,19 @@ class UserModel(User):
     contact = models.IntegerField(blank=True,null=True)
     image = models.ImageField(upload_to='downloads/',blank=True,null=True)
 
+
+class Request(models.Model):
+    req_from = models.ForeignKey(UserModel,on_delete=models.CASCADE,related_name="send_req_from",blank=True,null=True)
+    req_to = models.ForeignKey(UserModel,on_delete=models.CASCADE,related_name="send_req_to",blank=True,null=True)
+    status_choices = (
+        ('default','Default'),
+        ('send','Send'),
+        ('rejected','Rejected'),
+        ('blocked','Blocked'),
+        ('accepted','Accepted')
+    )
+    status = models.CharField(max_length=255,choices=status_choices,default="default",blank=True,null=True)
+
 class ChatModel(models.Model):
     from_user = models.ForeignKey(UserModel,on_delete=models.CASCADE,related_name="from_user",blank=True,null=True)
     to_user = models.ForeignKey(UserModel,on_delete=models.CASCADE,related_name="to_user",blank=True,null=True)
@@ -15,16 +28,5 @@ class ChatModel(models.Model):
         ('read','read'),
         ('unread','unread')
     ) 
-    status = models.CharField(max_length=255,choices=status_choices)
-    create_at = models.DateTimeField(auto_now_add=True)
-
-class Request(models.Model):
-    req_from = models.ForeignKey(UserModel,on_delete=models.CASCADE,related_name="send_req_from",blank=True,null=True)
-    req_to = models.ForeignKey(UserModel,on_delete=models.CASCADE,related_name="send_req_to",blank=True,null=True)
-    status_choices = (
-        ('default','Default'),
-        ('send','Send'),
-        ('blocked','Blocked'),
-        ('accepted','Accepted')
-    )
-    status = models.CharField(max_length=255,choices=status_choices,default="default",blank=True,null=True)
+    status = models.CharField(max_length=255,choices=status_choices,default='unread',blank=True,null=True)
+    create_at = models.DateTimeField(auto_now_add=True,blank=True,null=True)
